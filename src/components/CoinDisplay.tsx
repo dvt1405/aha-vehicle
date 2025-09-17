@@ -1,5 +1,6 @@
 "use client";
 import React from "react";
+import Image from "next/image";
 import { useGameState } from "@/game/store";
 
 /**
@@ -14,7 +15,7 @@ export default function CoinDisplay() {
   return (
     <div className="flex items-center gap-3">
       <div className="flex items-center gap-2 rounded-full bg-yellow-100 text-yellow-800 px-3 py-1 shadow-inner">
-        <span aria-hidden className="text-lg">🪙</span>
+        <Image src="/ic_aha_coin.png" alt="coin" width={18} height={18} />
         <span className="text-sm font-semibold">{coins}</span>
       </div>
       <div className="relative">

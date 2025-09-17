@@ -1,5 +1,6 @@
 "use client";
 import React, { useMemo, useRef, useState } from "react";
+import Image from "next/image";
 import BottomNav from "@/components/BottomNav";
 import { useGameActions, useGameState, Upgrades } from "@/game/store";
 
@@ -165,7 +166,7 @@ export default function ShopPage() {
         <div className="flex items-center justify-between mb-8">
           <h1 className="text-4xl font-black text-gray-800 drop-shadow-lg tracking-tight">Shop</h1>
           <div className="text-lg rounded-full bg-yellow-100 text-yellow-800 px-5 py-2 font-black shadow flex items-center gap-2">
-            <span role="img" aria-label="coin" className="text-2xl">🪙</span>
+            <Image src="/ic_aha_coin.png" alt="coin" width={24} height={24} />
             {coins}
           </div>
         </div>

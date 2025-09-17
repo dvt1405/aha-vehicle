@@ -1,5 +1,6 @@
 "use client";
 import React, { useEffect, useRef, useState } from "react";
+import Image from "next/image";
 import { drawMotorbikeSimple } from "@/utils/drawMotorbike";
 
 interface RewardScreenProps {
@@ -101,7 +102,13 @@ export default function RewardScreen({
                 animationDuration: '1.5s',
               }}
             >
-              🪙
+              <Image 
+                src="/ic_aha_coin.png" 
+                alt="coin" 
+                width={coin.size * 24} 
+                height={coin.size * 24} 
+                className="block"
+              />
             </div>
           ))}
 
@@ -192,7 +199,7 @@ export default function RewardScreen({
             )}
             <div className="col-span-2 border-t pt-3">
               <div className="text-2xl font-bold text-orange-600 flex items-center justify-center gap-2">
-                <span>🪙</span>
+                <Image src="/ic_aha_coin.png" alt="coin" width={28} height={28} />
                 <span>{coins}</span>
               </div>
               <div className="text-sm text-gray-600">Total Reward</div>
