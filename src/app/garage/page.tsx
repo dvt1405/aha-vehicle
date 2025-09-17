@@ -1,6 +1,7 @@
 "use client";
 import React, { useMemo } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import VehicleDisplay from "@/components/VehicleDisplay";
 import BottomNav from "@/components/BottomNav";
 import ProgressBar from "@/components/ProgressBar";
@@ -39,7 +40,7 @@ export default function GaragePage() {
       <div className="flex items-center justify-between mb-4">
         <h1 className="text-2xl font-extrabold">🏠 My Garage</h1>
         <div className="flex items-center gap-2 text-sm bg-yellow-100 text-yellow-800 px-3 py-1 rounded-full font-semibold">
-          <span>🪙</span>
+          <Image src="/ic_aha_coin.png" alt="coin" width={16} height={16} />
           <span>{coins}</span>
         </div>
       </div>
