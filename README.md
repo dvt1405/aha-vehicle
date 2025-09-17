@@ -1,36 +1,58 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Aha Vehicle Care — Scooter Sprint Mini Game
 
-## Getting Started
+This repository contains a Next.js 15 + React 19 app with a lightweight HTML5 Canvas racing mini-game accessible at `/racing`.
 
-First, run the development server:
+## Run locally
+
+1. Install dependencies
+
+```bash
+npm install
+```
+
+2. Start the dev server (Turbopack)
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+3. Open the app
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+Visit http://localhost:3000, then navigate to http://localhost:3000/racing to play the mini game.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Game overview
 
-## Learn More
+- Theme: Casual scooter race on a sunny city loop.
+- Rendering: HTML5 Canvas for gameplay with React UI overlay (HUD, minimap, buttons).
+- Input:
+  - Mobile: drag left/right on the canvas to steer; tap the Boost button to boost.
+  - Desktop: A/D or Left/Right to steer; Space to Boost; P/Esc to pause.
+- Objective: Complete 3 laps and finish first.
+- Collectibles: Coins on the track add to your global coins.
+- Power-up: Short speed boost with cooldown and visual trail.
+- AI: Two opponents with lane-following, mild rubber-banding, and occasional boosts.
 
-To learn more about Next.js, take a look at the following resources:
+## Controls (quick)
+- A/D or ←/→: steer
+- Space or Boost button: activate boost
+- P or Esc: pause
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Files of interest
+- Route: `src/app/racing/page.tsx`
+- Canvas renderer: `src/components/game/GameCanvas.tsx`
+- HUD: `src/components/game/HUD.tsx`
+- Minimap: `src/components/game/MiniMap.tsx`
+- Boost button: `src/components/game/BoostButton.tsx`
+- Victory overlay: `src/components/game/VictoryOverlay.tsx`
+- Game core loop/state: `src/game/core/engine.ts`
+- World/track helpers: `src/game/core/world.ts`
+- Opponent AI: `src/game/core/ai.ts`
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## Assets
+- The game uses simple vector drawing on Canvas for scooters/track.
+- UI icons reference small PNGs under `public/` (e.g., `ic_aha_coin.png`). You can replace these with your own assets if desired.
 
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## Notes
+- State is mobile-first and aims for smooth 60 FPS on mid devices.
+- Player coins are persisted in localStorage via the shared game store.
+- Basic console telemetry logs race finish events.
