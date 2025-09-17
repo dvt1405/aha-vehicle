@@ -172,7 +172,9 @@ function POWQuizModal({
   return (
     <div className="fixed inset-0 z-30 bg-black/30 flex items-center justify-center">
       <div className="bg-white rounded-2xl shadow-2xl p-6 w-[90vw] max-w-xs flex flex-col items-center">
-        <div className="text-2xl mb-2">{stop.type === "pickup" ? "📦" : "🏁"}</div>
+        <div className="text-3xl mb-2">
+          {stop.type === "pickup" ? "🏬" : "🏠"}
+        </div>
         <div className="font-bold text-lg mb-2 text-blue-700 text-center">{stop.question.text}</div>
         <div className="flex flex-col gap-2 w-full">
           {stop.question.options.map((opt, idx) => (
@@ -309,27 +311,47 @@ export default function OrderDispatchSimulator() {
       <div className="relative w-full max-w-2xl mx-auto">
         {/* Map */}
         <svg width={MAP_W} height={MAP_H} className="rounded-2xl shadow-xl bg-white border border-blue-200 mx-auto block">
-          {/* Stops */}
+          {/* Route lines */}
+          {stops.length > 1 && stops.map((stop, idx) => {
+            if (idx === 0) return null;
+            const prev = stops[idx - 1];
+            return (
+              <line
+                key={stop.id + "-route"}
+                x1={prev.location.x}
+                y1={prev.location.y}
+                x2={stop.location.x}
+                y2={stop.location.y}
+                stroke="#38bdf8"
+                strokeWidth={5}
+                strokeDasharray="10 8"
+                opacity={0.45}
+              />
+            );
+          })}
+          {/* Stops with distinct icons */}
           {stops.map((stop, idx) => (
             <g key={stop.id}>
               <circle
                 cx={stop.location.x}
                 cy={stop.location.y}
-                r={18}
+                r={26}
                 fill={stop.type === "pickup" ? "#38bdf8" : "#fbbf24"}
                 stroke={stop.type === "pickup" ? "#0ea5e9" : "#f59e42"}
-                strokeWidth={3}
-                opacity={idx === currentStopIdx ? 1 : 0.6}
+                strokeWidth={4}
+                opacity={idx === currentStopIdx ? 1 : 0.7}
+                filter={idx === currentStopIdx ? "url(#glow)" : undefined}
               />
               <text
                 x={stop.location.x}
-                y={stop.location.y + 6}
+                y={stop.location.y + 10}
                 textAnchor="middle"
-                fontSize={16}
-                fill="#fff"
+                fontSize={stop.type === "pickup" ? 32 : 32}
                 fontWeight={700}
+                fill="#fff"
+                style={{ pointerEvents: "none" }}
               >
-                {stop.type === "pickup" ? "P" : "D"}
+                {stop.type === "pickup" ? "🏬" : "🏠"}
               </text>
             </g>
           ))}
@@ -351,6 +373,9 @@ export default function OrderDispatchSimulator() {
           <defs>
             <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
               <feDropShadow dx="0" dy="2" stdDeviation="2" floodColor="#000" floodOpacity="0.18" />
+            </filter>
+            <filter id="glow" x="-40%" y="-40%" width="180%" height="180%">
+              <feDropShadow dx="0" dy="0" stdDeviation="6" floodColor="#fbbf24" floodOpacity="0.7" />
             </filter>
           </defs>
         </svg>
@@ -379,7 +404,7 @@ export default function OrderDispatchSimulator() {
         )}
       </div>
       <div className="mt-6 text-gray-500 text-xs max-w-lg text-center">
-        Accept an order, drive to each stop, and answer the Proof of Work questions to complete the delivery!
+        Accept an order, follow the route, and answer the Proof of Work questions at each stop to complete the delivery!
       </div>
       {/* POW Quiz Modal */}
       <POWQuizModal
