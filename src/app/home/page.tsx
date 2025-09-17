@@ -62,6 +62,12 @@ export default function HomeScreenPage() {
           <div className="pointer-events-auto">
             <SideButton as="link" href="/tasks" icon="📝" label="Tasks" />
           </div>
+          <div className="pointer-events-auto">
+            <SideButton as="link" href="/racing" icon="🏁" label="Aha Race" ariaLabel="Play Aha Race mini game" />
+          </div>
+          <div className="pointer-events-auto">
+            <SideButton as="link" href="/delivery" icon="🚚" label="Delivery" ariaLabel="Play Delivery mini game" />
+          </div>
         </div>
 
         {/* Right side buttons */}

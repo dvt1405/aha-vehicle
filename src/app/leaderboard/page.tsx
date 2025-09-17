@@ -1,4 +1,5 @@
 import React from "react";
+import BottomNav from "@/components/BottomNav";
 
 // Ahamove-style icons
 const StarIcon = () => (
@@ -131,6 +132,7 @@ export default function LeaderboardPage() {
                     ))}
                 </div>
             </div>
+            <BottomNav />
         </div>
     );
 }

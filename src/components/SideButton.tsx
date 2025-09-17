@@ -13,8 +13,12 @@ export type SideButtonProps = (
   ariaLabel?: string;
 };
 
+function isLinkProps(p: SideButtonProps): p is Extract<SideButtonProps, { as: "link"; href: string; onClick?: never }> {
+  return p.as === "link" && typeof (p as any).href === "string";
+}
+
 export default function SideButton(props: SideButtonProps) {
-  const { icon, label, disabled, className = "", ariaLabel } = props as any;
+  const { icon, label, disabled, className = "", ariaLabel } = props;
   const base = `flex flex-col items-center justify-center gap-1 w-14 sm:w-16 h-16 sm:h-20 rounded-2xl shadow-md border text-xs font-medium select-none ${
     disabled ? "opacity-50 cursor-not-allowed" : "hover:-translate-y-0.5"
   } transition-transform bg-white/90 backdrop-blur border-orange-100 text-gray-700 ${className}`;
@@ -28,8 +32,8 @@ export default function SideButton(props: SideButtonProps) {
     </div>
   );
 
-  if ((props as any).as === "link" && (props as any).href) {
-    const { href } = props as any;
+  if (isLinkProps(props)) {
+    const { href } = props;
     return (
       <Link href={href} className={base} aria-label={ariaLabel ?? label}>
         {content}
@@ -37,7 +41,7 @@ export default function SideButton(props: SideButtonProps) {
     );
   }
 
-  const { onClick } = props as any;
+  const onClick = (props.as === "button" || !props.as) ? props.onClick : undefined;
   return (
     <button type="button" onClick={onClick} className={base} aria-label={ariaLabel ?? label} disabled={disabled}>
       {content}

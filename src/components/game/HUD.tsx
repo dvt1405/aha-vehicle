@@ -2,11 +2,18 @@
 import React from "react";
 import Image from "next/image";
 import { PublicState } from "@/game/core/engine";
+import { progressDelta } from "@/game/core/world";
 
 export default function HUD({ state, onPause }: { state: PublicState; onPause: ()=>void }) {
   const lapNow = Math.min(state.player.laps + 1, state.totalLaps);
   const lapText = `LAP ${lapNow}/${state.totalLaps}`;
   const lapProgress = (state.player.u + state.player.laps) / state.totalLaps;
+
+  // Compute current place (1 = first)
+  const opponentsAhead = state.ai.filter(a => progressDelta(state.player.u, a.u) > 0).length;
+  const place = 1 + opponentsAhead;
+
+  const timeText = `${Math.floor(state.time).toString().padStart(2,'0')}:${Math.floor((state.time%1)*10)}`;
 
   // Helper to build an arc path for the curved progress (approx 200° -> -20°)
   const R = 26; const cx = 120; const cy = 32; const start = 200 * Math.PI/180; const end = -20 * Math.PI/180;
@@ -27,11 +34,12 @@ export default function HUD({ state, onPause }: { state: PublicState; onPause: (
         <span className="text-white font-semibold">{state.player.coins}</span>
       </div>
 
-      {/* Top-center Lap + curved gauge */}
+      {/* Top-center Lap + curved gauge + timer/position */}
       <div className="absolute top-2 inset-x-0 flex flex-col items-center gap-0.5">
-        <div className="flex items-center gap-1">
+        <div className="flex items-center gap-2">
           <div className="text-xs font-extrabold text-white drop-shadow">{lapText}</div>
           <Image src="/ic_race_flags.png" alt="flags" width={16} height={16} className="opacity-90" />
+          <div className="text-xs font-bold text-white/90 drop-shadow">· ⏱ {state.time.toFixed(1)}s · P{place}</div>
         </div>
         <svg width="240" height="40" className="drop-shadow">
           {/* track */}

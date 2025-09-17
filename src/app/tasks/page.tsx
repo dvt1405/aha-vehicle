@@ -1,5 +1,6 @@
 "use client";
 import React from "react";
+import Link from "next/link";
 import BottomNav from "@/components/BottomNav";
 import ProgressBar from "@/components/ProgressBar";
 import { useGameActions, useGameState } from "@/game/store";
@@ -11,13 +12,26 @@ export default function TasksPage() {
   return (
     <div className="pb-24">
       <div className="flex items-center justify-between mb-4">
-        <h1 className="text-2xl font-extrabold">Tasks</h1>
-        <button
-          onClick={() => completeDelivery(1)}
-          className="rounded-xl bg-orange-600 hover:bg-orange-700 text-white text-sm font-semibold px-4 py-2 shadow"
-        >
-          Start Delivery +1
-        </button>
+        <h1 className="text-2xl font-extrabold">Tasks & Missions</h1>
+        <div className="flex gap-2">
+          <Link
+            href="/racing"
+            className="rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold px-4 py-2 shadow"
+          >
+            🏁 Race
+          </Link>
+          <Link
+            href="/delivery"
+            className="rounded-xl bg-orange-600 hover:bg-orange-700 text-white text-sm font-semibold px-4 py-2 shadow"
+          >
+            🚚 Deliver
+          </Link>
+        </div>
+      </div>
+
+      <div className="mb-6 p-4 rounded-2xl bg-gradient-to-r from-orange-100 to-blue-100 border">
+        <h2 className="font-bold text-lg mb-2">🎯 Daily Challenges</h2>
+        <p className="text-sm text-gray-700">Complete mini games to earn coins and progress through missions!</p>
       </div>
 
       <div className="space-y-4">
@@ -46,15 +60,23 @@ export default function TasksPage() {
                       m.claimed ? "bg-gray-100 text-gray-400" : "bg-green-600 text-white hover:bg-green-700"
                     }`}
                   >
-                    {m.claimed ? "Claimed" : "Claim"}
+                    {m.claimed ? "✓ Claimed" : "🎁 Claim Reward"}
                   </button>
                 ) : (
-                  <button
-                    onClick={() => completeDelivery(m.goal - m.progress)}
-                    className="rounded-xl px-4 py-2 text-sm font-semibold shadow bg-blue-600 text-white hover:bg-blue-700"
-                  >
-                    Finish Now
-                  </button>
+                  <div className="flex gap-2">
+                    <Link
+                      href="/delivery"
+                      className="rounded-xl px-4 py-2 text-sm font-semibold shadow bg-orange-600 text-white hover:bg-orange-700"
+                    >
+                      🚚 Play Delivery
+                    </Link>
+                    <Link
+                      href="/racing"
+                      className="rounded-xl px-4 py-2 text-sm font-semibold shadow bg-blue-600 text-white hover:bg-blue-700"
+                    >
+                      🏁 Play Racing
+                    </Link>
+                  </div>
                 )}
               </div>
             </div>

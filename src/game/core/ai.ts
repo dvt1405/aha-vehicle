@@ -7,12 +7,13 @@ export type Racer = {
   targetLane: number;
   boostTimer: number;
   boostCooldown: number;
+  laps: number; // completed laps
 };
 
 export function createAIRacers(count: number): Racer[] {
   const arr: Racer[] = [];
   for (let i = 0; i < count; i++) {
-    arr.push({ u: 0.25 + i * 0.15, lane: i === 0 ? -0.3 : 0.3, targetLane: 0, speed: 0.16, boostTimer: 0, boostCooldown: 2 + i * 0.8 });
+    arr.push({ u: 0.25 + i * 0.15, lane: i === 0 ? -0.3 : 0.3, targetLane: 0, speed: 0.16, boostTimer: 0, boostCooldown: 2 + i * 0.8, laps: 0 });
   }
   return arr;
 }
@@ -46,6 +47,12 @@ export function updateAI(dt: number, ai: Racer[], playerU: number, playerSpeed: 
 
     // advance
     a.speed = maxSpeed;
-    a.u = wrap01(a.u + a.speed * dt);
+    a.u = a.u + a.speed * dt;
+    
+    // lap completion for straight track
+    if (a.u >= 1.0) {
+      a.laps += 1;
+      a.u = 0;
+    }
   }
 }
