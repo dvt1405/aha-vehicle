@@ -50,7 +50,7 @@ const ICONS: Record<string, string> = {
   deliveryBox: "📦",
 };
 
-type UpgradeKey = keyof typeof PRICES;
+type UpgradeKey = keyof Upgrades;
 
 function ShoppingAnimation({ show }: { show: boolean }) {
   return (
@@ -73,10 +73,10 @@ function UpgradeCard({
   coins,
   onBuy,
 }: {
-  k: string;
+  k: UpgradeKey;
   owned: boolean;
   coins: number;
-  onBuy: (k: string, animate: () => void) => Promise<void>;
+  onBuy: (k: UpgradeKey, animate: () => void) => Promise<void>;
 }) {
   const [loading, setLoading] = useState(false);
   const [showAnim, setShowAnim] = useState(false);
@@ -148,11 +148,11 @@ export default function ShopPage() {
   const { coins, vehicle } = useGameState();
   const { buyUpgrade } = useGameActions();
   const upgrades = vehicle.upgrades || {};
-  const items = useMemo(() => Object.keys(PRICES), []);
+  const items = useMemo(() => Object.keys(PRICES) as UpgradeKey[], []);
 
-  async function onBuy(key: string, animate: () => void) {
+  async function onBuy(key: UpgradeKey, animate: () => void) {
     animate();
-    buyUpgrade(key as UpgradeKey, PRICES[key]);
+    buyUpgrade(key, PRICES[key]);
   }
 
   return (

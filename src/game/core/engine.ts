@@ -84,7 +84,7 @@ export function useGameCore(config: GameConfig, hooks: GameHooks) {
     },
     togglePause: () => setState((s) => ({ ...s, phase: s.phase === "paused" ? "racing" : s.phase === "racing" ? "paused" : s.phase })),
     restart: () => {
-      const track = createOvalTrack({ x: 0, y: 0 }, config.trackRadius, config.trackRadius * 0.65, config.roadWidth / 2);
+      const track = createStraightTrack({ x: 0, y: config.trackRadius * 2 }, { x: 0, y: -config.trackRadius * 2 }, config.roadWidth / 2);
       const player: Player = { u: 0, lane: 0, speed: 0, boosting: 0, boostCooldown: 0, coins: 0, laps: 0, lastU: 0 };
       const ai = createAIRacers(config.ai.count);
       setState({ phase: "countdown", time: 0, countdown: 3, track, player, ai, totalLaps: config.lapsToWin });
@@ -134,7 +134,7 @@ export function useGameCore(config: GameConfig, hooks: GameHooks) {
 }
 
 function step(prev: GameStateCore, dt: number, config: GameConfig, hooks: GameHooks, desiredTurn: number): GameStateCore {
-  let s = { ...prev } as GameStateCore;
+  const s = { ...prev } as GameStateCore;
 
   if (s.phase === "paused" || s.phase === "finished") return s;
 
