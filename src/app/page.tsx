@@ -38,6 +38,11 @@ export default function Home() {
                 Play Mini Game
               </CTAButton>
             </Link>
+            <Link href="/orderdispatch" className="w-full sm:w-auto min-w-44">
+              <CTAButton className="bg-blue-500 hover:bg-blue-600">
+                Dispatch Game
+              </CTAButton>
+            </Link>
             <Link href="/leaderboard" className="text-orange-600 hover:underline text-sm">View Leaderboard</Link>
           </div>
         </div>

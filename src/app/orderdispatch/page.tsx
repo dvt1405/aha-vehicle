@@ -1,0 +1,392 @@
+"use client";
+import React, { useEffect, useRef, useState } from "react";
+
+// --- Types ---
+type Point = { x: number; y: number };
+type StopType = "pickup" | "dropoff";
+type OrderStatus = "AVAILABLE" | "IN_PROGRESS" | "COMPLETED";
+type Stop = {
+  id: string;
+  type: StopType;
+  location: Point;
+  question: Question;
+  answered: boolean;
+};
+type Order = {
+  id: string;
+  stops: Stop[];
+  prize: number;
+};
+type Question = {
+  text: string;
+  options: string[];
+  answer: number; // index of correct answer
+};
+
+// --- Helpers ---
+const MAP_W = 700, MAP_H = 400;
+const rand = (min: number, max: number) => Math.random() * (max - min) + min;
+const dist = (a: Point, b: Point) => Math.hypot(a.x - b.x, a.y - b.y);
+const uid = () => Math.random().toString(36).slice(2, 10);
+
+// Real Ahamove Order Dispatch & POW questions
+const QUESTIONS: Question[] = [
+  {
+    text: "What should you do before accepting an order?",
+    options: [
+      "Check pickup/drop-off locations and your availability",
+      "Accept all orders regardless of your situation",
+      "Ignore the order details",
+      "Accept and cancel if busy",
+    ],
+    answer: 0,
+  },
+  {
+    text: "At the pickup point, what is the correct action?",
+    options: [
+      "Confirm order details with sender and collect the package",
+      "Go directly to drop-off",
+      "Take a break",
+      "Leave if sender is not present immediately",
+    ],
+    answer: 0,
+  },
+  {
+    text: "What is required for Proof of Pickup?",
+    options: [
+      "Take a clear photo of the package or scan QR if required",
+      "Just say 'picked up' in the app",
+      "Skip this step",
+      "Call the receiver",
+    ],
+    answer: 0,
+  },
+  {
+    text: "How do you provide Proof of Delivery?",
+    options: [
+      "Take a photo at drop-off or enter the delivery code",
+      "Only call the sender",
+      "Leave the package and go",
+      "Skip confirmation",
+    ],
+    answer: 0,
+  },
+  {
+    text: "If you can't complete an order, what should you do?",
+    options: [
+      "Contact support and explain the situation",
+      "Cancel without notice",
+      "Deliver to a random address",
+      "Ignore the order",
+    ],
+    answer: 0,
+  },
+  {
+    text: "What happens if you cancel too many orders?",
+    options: [
+      "Your reputation and incentives may decrease",
+      "You get more coins",
+      "You get a bonus",
+      "Nothing happens",
+    ],
+    answer: 0,
+  },
+  {
+    text: "What should you do if you can't find the pickup or drop-off location?",
+    options: [
+      "Contact the sender or receiver for clarification",
+      "Skip the order",
+      "Guess the address",
+      "Cancel immediately",
+    ],
+    answer: 0,
+  },
+  {
+    text: "Is it allowed to falsify photos or codes for Proof of Work?",
+    options: [
+      "No, always provide honest proof as required",
+      "Yes, if in a hurry",
+      "Only if the app allows",
+      "Sometimes",
+    ],
+    answer: 0,
+  },
+];
+
+// Generate a random stop with a random question
+function randomStop(type: StopType): Stop {
+  const location = { x: rand(60, MAP_W - 60), y: rand(60, MAP_H - 60) };
+  const question = QUESTIONS[Math.floor(Math.random() * QUESTIONS.length)];
+  return {
+    id: uid(),
+    type,
+    location,
+    question,
+    answered: false,
+  };
+}
+
+// Generate an order with multiple stops (e.g., 2 pickups, 2 dropoffs)
+function randomOrder(): Order {
+  const stops: Stop[] = [
+    randomStop("pickup"),
+    randomStop("pickup"),
+    randomStop("dropoff"),
+    randomStop("dropoff"),
+  ];
+  // Ensure stops are not too close to each other
+  for (let i = 1; i < stops.length; i++) {
+    while (dist(stops[i].location, stops[i - 1].location) < 100) {
+      stops[i].location = { x: rand(60, MAP_W - 60), y: rand(60, MAP_H - 60) };
+    }
+  }
+  return {
+    id: uid(),
+    stops,
+    prize: Math.round(rand(80, 160)),
+  };
+}
+
+function moveToward(a: Point, b: Point, speed: number): Point {
+  const d = dist(a, b);
+  if (d === 0 || speed >= d) return { ...b };
+  const t = speed / d;
+  return { x: a.x + (b.x - a.x) * t, y: a.y + (b.y - a.y) * t };
+}
+
+// --- POW Quiz Modal ---
+function POWQuizModal({
+  open,
+  stop,
+  onAnswer,
+}: {
+  open: boolean;
+  stop: Stop | null;
+  onAnswer: (correct: boolean) => void;
+}) {
+  const [selected, setSelected] = useState<number | null>(null);
+  useEffect(() => {
+    setSelected(null);
+  }, [open, stop?.id]);
+  if (!open || !stop) return null;
+  return (
+    <div className="fixed inset-0 z-30 bg-black/30 flex items-center justify-center">
+      <div className="bg-white rounded-2xl shadow-2xl p-6 w-[90vw] max-w-xs flex flex-col items-center">
+        <div className="text-2xl mb-2">{stop.type === "pickup" ? "📦" : "🏁"}</div>
+        <div className="font-bold text-lg mb-2 text-blue-700 text-center">{stop.question.text}</div>
+        <div className="flex flex-col gap-2 w-full">
+          {stop.question.options.map((opt, idx) => (
+            <button
+              key={idx}
+              className={`px-3 py-2 rounded-lg border font-semibold text-sm transition-all
+                ${selected === idx
+                  ? idx === stop.question.answer
+                    ? "bg-green-100 border-green-400 text-green-700"
+                    : "bg-red-100 border-red-400 text-red-700"
+                  : "bg-gray-50 border-gray-200 hover:bg-blue-50"}
+              `}
+              disabled={selected !== null}
+              onClick={() => {
+                setSelected(idx);
+                setTimeout(() => onAnswer(idx === stop.question.answer), 700);
+              }}
+            >
+              {opt}
+            </button>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// --- Main Component ---
+export default function OrderDispatchSimulator() {
+  const [orders, setOrders] = useState<Order[]>(() => [randomOrder()]);
+  const [driver, setDriver] = useState<Point>({ x: MAP_W / 2, y: MAP_H / 2 });
+  const [status, setStatus] = useState<OrderStatus>("AVAILABLE");
+  const [currentOrder, setCurrentOrder] = useState<Order | null>(null);
+  const [currentStopIdx, setCurrentStopIdx] = useState<number>(0);
+  const [score, setScore] = useState(0);
+  const [msg, setMsg] = useState<string | null>(null);
+  const [quizOpen, setQuizOpen] = useState(false);
+  const [quizStop, setQuizStop] = useState<Stop | null>(null);
+  const animRef = useRef<number>();
+
+  // Animation loop
+  useEffect(() => {
+    if (status !== "IN_PROGRESS" || !currentOrder) return;
+    let last = performance.now();
+    function frame(now: number) {
+      const dt = Math.min((now - last) / 1000, 0.1);
+      last = now;
+      setDriver((pos) => {
+        const stop = currentOrder.stops[currentStopIdx];
+        if (!stop) return pos;
+        const next = moveToward(pos, stop.location, 180 * dt);
+        if (dist(next, stop.location) < 10 && !stop.answered && !quizOpen) {
+          setQuizStop(stop);
+          setQuizOpen(true);
+        }
+        return next;
+      });
+      animRef.current = requestAnimationFrame(frame);
+    }
+    animRef.current = requestAnimationFrame(frame);
+    return () => animRef.current && cancelAnimationFrame(animRef.current);
+    // eslint-disable-next-line
+  }, [currentOrder, status, currentStopIdx, quizOpen]);
+
+  // Accept order
+  function acceptOrder(order: Order) {
+    if (status !== "AVAILABLE") return;
+    setCurrentOrder(order);
+    setStatus("IN_PROGRESS");
+    setCurrentStopIdx(0);
+    setMsg("Drive to the first stop!");
+  }
+
+  // Handle quiz answer
+  function handleQuizAnswer(correct: boolean) {
+    setQuizOpen(false);
+    if (!currentOrder) return;
+    const stops = currentOrder.stops.map((s, i) =>
+      i === currentStopIdx ? { ...s, answered: true } : s
+    );
+    setCurrentOrder({ ...currentOrder, stops });
+    if (correct) {
+      setScore((s) => s + 1);
+      setMsg("✅ Correct! Proceed to next stop.");
+    } else {
+      setMsg("❌ Wrong answer. Try to do better next stop!");
+    }
+    // Move to next stop or finish
+    if (currentStopIdx < stops.length - 1) {
+      setTimeout(() => {
+        setCurrentStopIdx((idx) => idx + 1);
+        setMsg("Drive to the next stop!");
+      }, 900);
+    } else {
+      setStatus("COMPLETED");
+      setMsg(`Order complete! Total score: ${score + (correct ? 1 : 0)} / ${stops.length}`);
+    }
+  }
+
+  // Reset game
+  function reset() {
+    setOrders([randomOrder()]);
+    setDriver({ x: MAP_W / 2, y: MAP_H / 2 });
+    setCurrentOrder(null);
+    setCurrentStopIdx(0);
+    setStatus("AVAILABLE");
+    setScore(0);
+    setMsg(null);
+    setQuizOpen(false);
+    setQuizStop(null);
+  }
+
+  // --- Render ---
+  const stops = currentOrder?.stops ?? [];
+  const currentStop = stops[currentStopIdx];
+
+  return (
+    <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-br from-blue-100 to-orange-50 py-8 px-2">
+      <h1 className="text-2xl sm:text-3xl font-extrabold mb-2 text-orange-600 drop-shadow">Order Dispatch Simulator</h1>
+      <div className="mb-6 max-w-xl bg-white/80 rounded-xl shadow p-4 border-l-4 border-blue-400 text-left">
+        <h2 className="font-bold text-blue-700 mb-2 text-lg flex items-center gap-2">
+          <span>📜</span> Proof of Work Challenge
+        </h2>
+        <ul className="list-disc pl-5 text-gray-700 text-sm space-y-1">
+          <li>Each stop (pickup/dropoff) will challenge you with a question about Ahamove Order Dispatch and Proof of Work.</li>
+          <li>Answer correctly to earn points and proceed to the next stop.</li>
+          <li>Try to get all answers right for a perfect score!</li>
+        </ul>
+      </div>
+      <div className="mb-2 text-lg font-bold text-gray-700">
+        Score: <span className="text-yellow-500">{score}</span>
+      </div>
+      {msg && <div className="mb-2 text-base font-bold text-blue-700 animate-bounce">{msg}</div>}
+      <div className="relative w-full max-w-2xl mx-auto">
+        {/* Map */}
+        <svg width={MAP_W} height={MAP_H} className="rounded-2xl shadow-xl bg-white border border-blue-200 mx-auto block">
+          {/* Stops */}
+          {stops.map((stop, idx) => (
+            <g key={stop.id}>
+              <circle
+                cx={stop.location.x}
+                cy={stop.location.y}
+                r={18}
+                fill={stop.type === "pickup" ? "#38bdf8" : "#fbbf24"}
+                stroke={stop.type === "pickup" ? "#0ea5e9" : "#f59e42"}
+                strokeWidth={3}
+                opacity={idx === currentStopIdx ? 1 : 0.6}
+              />
+              <text
+                x={stop.location.x}
+                y={stop.location.y + 6}
+                textAnchor="middle"
+                fontSize={16}
+                fill="#fff"
+                fontWeight={700}
+              >
+                {stop.type === "pickup" ? "P" : "D"}
+              </text>
+            </g>
+          ))}
+          {/* Driver */}
+          {status !== "AVAILABLE" && currentStop && (
+            <g>
+              <circle
+                cx={driver.x}
+                cy={driver.y}
+                r={18}
+                fill="#fb923c"
+                stroke="#ea580c"
+                strokeWidth={4}
+                filter="url(#shadow)"
+              />
+              <text x={driver.x} y={driver.y + 7} textAnchor="middle" fontSize={18} fill="#fff" fontWeight={700}>🛵</text>
+            </g>
+          )}
+          <defs>
+            <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
+              <feDropShadow dx="0" dy="2" stdDeviation="2" floodColor="#000" floodOpacity="0.18" />
+            </filter>
+          </defs>
+        </svg>
+        {/* Accept Order Button - Centered and Bigger */}
+        {status === "AVAILABLE" && orders.length > 0 && (
+          <div className="absolute left-1/2 -translate-x-1/2 top-1/2 -translate-y-1/2 z-20 flex justify-center w-full">
+            <button
+              onClick={() => acceptOrder(orders[0])}
+              className="px-8 py-5 rounded-2xl font-extrabold text-xl shadow-2xl bg-gradient-to-r from-orange-400 to-orange-500 text-white border-4 border-orange-200 hover:scale-105 hover:from-orange-500 hover:to-orange-600 transition-all duration-200"
+              style={{ minWidth: 260 }}
+            >
+              Accept Order <span className="font-black text-yellow-200">+{orders[0].prize}</span>
+            </button>
+          </div>
+        )}
+        {/* Reset Button */}
+        {status === "COMPLETED" && (
+          <div className="absolute top-2 right-2 z-10">
+            <button
+              onClick={reset}
+              className="px-4 py-2 rounded-xl bg-orange-500 text-white font-extrabold shadow-lg hover:bg-orange-600 transition-all"
+            >
+              Play Again
+            </button>
+          </div>
+        )}
+      </div>
+      <div className="mt-6 text-gray-500 text-xs max-w-lg text-center">
+        Accept an order, drive to each stop, and answer the Proof of Work questions to complete the delivery!
+      </div>
+      {/* POW Quiz Modal */}
+      <POWQuizModal
+        open={quizOpen}
+        stop={quizStop}
+        onAnswer={handleQuizAnswer}
+      />
+    </div>
+  );
+}
