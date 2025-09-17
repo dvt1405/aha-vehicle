@@ -1,5 +1,6 @@
 "use client";
 import React, { useEffect, useMemo, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { useGameActions, useGameState } from "@/game/store";
 import GameCanvas from "@/components/game/GameCanvas";
 import HUD from "@/components/game/HUD";
@@ -9,6 +10,7 @@ import MiniMap from "@/components/game/MiniMap";
 import { GameConfig, useGameCore } from "@/game/core/engine";
 
 export default function RacingPage() {
+  const { t } = useTranslation();
   const { addCoins } = useGameActions();
   const { vehicle } = useGameState();
 
@@ -76,9 +78,9 @@ export default function RacingPage() {
           <button
             onClick={() => core.api.toggleLane?.()}
             className="rounded-full w-20 h-20 sm:w-24 sm:h-24 bg-gray-800/70 text-white font-bold shadow-lg hover:bg-gray-800"
-            aria-label="Steer"
+            aria-label={t('steer')}
           >
-            Steer
+            {t('steer')}
           </button>
         </div>
 
@@ -88,7 +90,7 @@ export default function RacingPage() {
         )}
       </div>
 
-      <p className="mt-3 text-center text-xs text-gray-500">Controls: A/D or Left/Right to steer, Space to Boost, P/Esc to pause. On mobile: drag left/right to steer, tap Boost, tap Steer to switch lane.</p>
+      <p className="mt-3 text-center text-xs text-gray-500">{t('controlsInstructions')}</p>
     </div>
   );
 }

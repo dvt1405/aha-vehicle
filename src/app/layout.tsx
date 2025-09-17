@@ -15,7 +15,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Driver Vehicle Care",
+  title: "Xế cưng Aha",
   description: "Casual vehicle care & upgrade web game",
 };
 
@@ -25,7 +25,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="vi">
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased bg-white text-gray-900`}>
         <Providers>
           <Header />

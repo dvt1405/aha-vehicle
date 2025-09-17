@@ -1,5 +1,6 @@
 "use client";
 import React, { useEffect, useRef, useState } from "react";
+import { useTranslation } from "react-i18next";
 
 // --- Types ---
 type Point = { x: number; y: number };
@@ -29,85 +30,85 @@ const rand = (min: number, max: number) => Math.random() * (max - min) + min;
 const dist = (a: Point, b: Point) => Math.hypot(a.x - b.x, a.y - b.y);
 const uid = () => Math.random().toString(36).slice(2, 10);
 
-// Real Ahamove Order Dispatch & POW questions
+// Real Ahamove Order Dispatch & POW questions (Vietnamese translations)
 const QUESTIONS: Question[] = [
   {
-    text: "What should you do before accepting an order?",
+    text: "Bạn nên làm gì trước khi nhận đơn hàng?",
     options: [
-      "Check pickup/drop-off locations and your availability",
-      "Accept all orders regardless of your situation",
-      "Ignore the order details",
-      "Accept and cancel if busy",
+      "Kiểm tra địa điểm nhận/giao và tình trạng sẵn sàng của mình",
+      "Nhận tất cả đơn hàng bất kể tình huống của bạn",
+      "Bỏ qua chi tiết đơn hàng",
+      "Nhận và hủy nếu bận",
     ],
     answer: 0,
   },
   {
-    text: "At the pickup point, what is the correct action?",
+    text: "Tại điểm nhận hàng, hành động đúng là gì?",
     options: [
-      "Confirm order details with sender and collect the package",
-      "Go directly to drop-off",
-      "Take a break",
-      "Leave if sender is not present immediately",
+      "Xác nhận chi tiết đơn hàng với người gửi và nhận gói hàng",
+      "Đi thẳng đến điểm giao",
+      "Nghỉ ngơi",
+      "Rời đi nếu người gửi không có mặt ngay",
     ],
     answer: 0,
   },
   {
-    text: "What is required for Proof of Pickup?",
+    text: "Điều gì cần thiết cho Bằng Chứng Nhận Hàng?",
     options: [
-      "Take a clear photo of the package or scan QR if required",
-      "Just say 'picked up' in the app",
-      "Skip this step",
-      "Call the receiver",
+      "Chụp ảnh rõ ràng gói hàng hoặc quét QR nếu được yêu cầu",
+      "Chỉ cần nói 'đã nhận' trong app",
+      "Bỏ qua bước này",
+      "Gọi cho người nhận",
     ],
     answer: 0,
   },
   {
-    text: "How do you provide Proof of Delivery?",
+    text: "Làm thế nào để cung cấp Bằng Chứng Giao Hàng?",
     options: [
-      "Take a photo at drop-off or enter the delivery code",
-      "Only call the sender",
-      "Leave the package and go",
-      "Skip confirmation",
+      "Chụp ảnh tại điểm giao hoặc nhập mã giao hàng",
+      "Chỉ gọi cho người gửi",
+      "Để gói hàng và đi",
+      "Bỏ qua xác nhận",
     ],
     answer: 0,
   },
   {
-    text: "If you can't complete an order, what should you do?",
+    text: "Nếu bạn không thể hoàn thành đơn hàng, bạn nên làm gì?",
     options: [
-      "Contact support and explain the situation",
-      "Cancel without notice",
-      "Deliver to a random address",
-      "Ignore the order",
+      "Liên hệ hỗ trợ và giải thích tình huống",
+      "Hủy mà không thông báo",
+      "Giao đến một địa chỉ ngẫu nhiên",
+      "Bỏ qua đơn hàng",
     ],
     answer: 0,
   },
   {
-    text: "What happens if you cancel too many orders?",
+    text: "Điều gì xảy ra nếu bạn hủy quá nhiều đơn hàng?",
     options: [
-      "Your reputation and incentives may decrease",
-      "You get more coins",
-      "You get a bonus",
-      "Nothing happens",
+      "Danh tiếng và ưu đãi của bạn có thể giảm",
+      "Bạn nhận được nhiều xu hơn",
+      "Bạn nhận được tiền thưởng",
+      "Không có gì xảy ra",
     ],
     answer: 0,
   },
   {
-    text: "What should you do if you can't find the pickup or drop-off location?",
+    text: "Bạn nên làm gì nếu không thể tìm thấy địa điểm nhận hoặc giao hàng?",
     options: [
-      "Contact the sender or receiver for clarification",
-      "Skip the order",
-      "Guess the address",
-      "Cancel immediately",
+      "Liên hệ với người gửi hoặc người nhận để làm rõ",
+      "Bỏ qua đơn hàng",
+      "Đoán địa chỉ",
+      "Hủy ngay lập tức",
     ],
     answer: 0,
   },
   {
-    text: "Is it allowed to falsify photos or codes for Proof of Work?",
+    text: "Có được phép làm giả ảnh hoặc mã cho Bằng Chứng Công Việc không?",
     options: [
-      "No, always provide honest proof as required",
-      "Yes, if in a hurry",
-      "Only if the app allows",
-      "Sometimes",
+      "Không, luôn cung cấp bằng chứng trung thực theo yêu cầu",
+      "Có, nếu đang vội",
+      "Chỉ khi app cho phép",
+      "Thỉnh thoảng",
     ],
     answer: 0,
   },
@@ -204,6 +205,7 @@ function POWQuizModal({
 
 // --- Main Component ---
 export default function OrderDispatchSimulator() {
+  const { t } = useTranslation();
   const [orders, setOrders] = useState<Order[]>(() => [randomOrder()]);
   const [driver, setDriver] = useState<Point>({ x: MAP_W / 2, y: MAP_H / 2 });
   const [status, setStatus] = useState<OrderStatus>("AVAILABLE");
@@ -298,19 +300,19 @@ export default function OrderDispatchSimulator() {
 
   return (
     <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-br from-blue-100 to-orange-50 py-8 px-2">
-      <h1 className="text-2xl sm:text-3xl font-extrabold mb-2 text-orange-600 drop-shadow">Order Dispatch Simulator</h1>
+      <h1 className="text-2xl sm:text-3xl font-extrabold mb-2 text-orange-600 drop-shadow">{t('orderDispatchSimulator')}</h1>
       <div className="mb-6 max-w-xl bg-white/80 rounded-xl shadow p-4 border-l-4 border-blue-400 text-left">
         <h2 className="font-bold text-blue-700 mb-2 text-lg flex items-center gap-2">
-          <span>📜</span> Proof of Work Challenge
+          <span>📜</span> {t('proofOfWorkChallenge')}
         </h2>
         <ul className="list-disc pl-5 text-gray-700 text-sm space-y-1">
-          <li>Each stop (pickup/dropoff) will challenge you with a question about Ahamove Order Dispatch and Proof of Work.</li>
-          <li>Answer correctly to earn points and proceed to the next stop.</li>
-          <li>Try to get all answers right for a perfect score!</li>
+          <li>{t('challengeDescription1')}</li>
+          <li>{t('challengeDescription2')}</li>
+          <li>{t('challengeDescription3')}</li>
         </ul>
       </div>
       <div className="mb-2 text-lg font-bold text-gray-700">
-        Score: <span className="text-yellow-500">{score}</span>
+        {t('score')}: <span className="text-yellow-500">{score}</span>
       </div>
       {msg && <div className="mb-2 text-base font-bold text-blue-700 animate-bounce">{msg}</div>}
       <div className="relative w-full max-w-2xl mx-auto">
@@ -392,7 +394,7 @@ export default function OrderDispatchSimulator() {
               className="px-8 py-5 rounded-2xl font-extrabold text-xl shadow-2xl bg-gradient-to-r from-orange-400 to-orange-500 text-white border-4 border-orange-200 hover:scale-105 hover:from-orange-500 hover:to-orange-600 transition-all duration-200"
               style={{ minWidth: 260 }}
             >
-              Accept Order <span className="font-black text-yellow-200">+{orders[0].prize}</span>
+{t('acceptOrder')} <span className="font-black text-yellow-200">+{orders[0].prize}</span>
             </button>
           </div>
         )}
@@ -403,13 +405,13 @@ export default function OrderDispatchSimulator() {
               onClick={reset}
               className="px-4 py-2 rounded-xl bg-orange-500 text-white font-extrabold shadow-lg hover:bg-orange-600 transition-all"
             >
-              Play Again
+{t('playAgain')}
             </button>
           </div>
         )}
       </div>
       <div className="mt-6 text-gray-500 text-xs max-w-lg text-center">
-        Accept an order, follow the route, and answer the Proof of Work questions at each stop to complete the delivery!
+        {t('gameInstructions')}
       </div>
       {/* POW Quiz Modal */}
       <POWQuizModal

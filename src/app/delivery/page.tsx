@@ -1,5 +1,6 @@
 "use client";
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { useGameActions, useGameState } from "@/game/store";
 import { drawMotorbikeSimple } from "@/utils/drawMotorbike";
 import RewardScreen from "@/components/game/RewardScreen";
@@ -255,6 +256,7 @@ function DeliveryCanvas({ gameState }: { gameState: DeliveryGameState }) {
 
 // HUD Component for Delivery Game
 function DeliveryHUD({ gameState, onPause }: { gameState: DeliveryGameState; onPause: () => void }) {
+  const { t } = useTranslation();
   const minutes = Math.floor(gameState.timeLeft / 60);
   const seconds = Math.floor(gameState.timeLeft % 60);
 
@@ -263,26 +265,26 @@ function DeliveryHUD({ gameState, onPause }: { gameState: DeliveryGameState; onP
       <div className="flex items-center justify-between text-white">
         <div className="flex items-center gap-2 flex-wrap">
           <div className="bg-black/30 px-3 py-1 rounded text-sm">
-            Score: {gameState.score}
+            {t('score')}: {gameState.score}
           </div>
           <div className="bg-black/30 px-3 py-1 rounded text-sm">
-            Time: {minutes}:{seconds.toString().padStart(2, '0')}
+            {t('time')}: {minutes}:{seconds.toString().padStart(2, '0')}
           </div>
           <div className="bg-black/30 px-3 py-1 rounded text-sm">
-            Carrying: {gameState.packagesCarried.length}/{gameState.maxPackages}
+            {t('carrying')}: {gameState.packagesCarried.length}/{gameState.maxPackages}
           </div>
           <div className="bg-blue-500/30 px-3 py-1 rounded text-sm border border-blue-400/50">
-            Pickups: {gameState.totalPickups}
+            {t('pickups')}: {gameState.totalPickups}
           </div>
           <div className="bg-orange-500/30 px-3 py-1 rounded text-sm border border-orange-400/50">
-            Dropoffs: {gameState.totalDropoffs}
+            {t('dropoffs')}: {gameState.totalDropoffs}
           </div>
         </div>
         <button
           onClick={onPause}
           className="bg-black/30 hover:bg-black/50 px-3 py-1 rounded text-white"
         >
-          {gameState.phase === 'paused' ? 'Resume' : 'Pause'}
+{gameState.phase === 'paused' ? t('resume') : t('pause')}
         </button>
       </div>
     </div>
@@ -309,6 +311,7 @@ function DeliveryVictoryOverlay({ gameState, onRestart }: { gameState: DeliveryG
 }
 
 export default function DeliveryPage() {
+  const { t } = useTranslation();
   const { addCoins } = useGameActions();
   const { vehicle } = useGameState();
 
@@ -420,12 +423,12 @@ export default function DeliveryPage() {
         {gameState.phase === "paused" && (
           <div className="absolute inset-0 bg-black/50 flex items-center justify-center">
             <div className="bg-white p-4 rounded-lg">
-              <p className="text-gray-800 font-semibold">Game Paused</p>
+              <p className="text-gray-800 font-semibold">{t('gamePaused')}</p>
               <button
                 onClick={togglePause}
                 className="mt-2 bg-blue-500 text-white px-4 py-2 rounded"
               >
-                Resume
+                {t('resume')}
               </button>
             </div>
           </div>
@@ -433,7 +436,7 @@ export default function DeliveryPage() {
       </div>
 
       <p className="mt-3 text-center text-xs text-gray-500">
-        Controls: WASD or Arrow keys to move, P/Esc to pause. Drive to blue packages to pick up, then deliver to orange houses. On mobile: tap direction buttons.
+        {t('deliveryControlsInstructions')}
       </p>
     </div>
   );
