@@ -1,27 +1,61 @@
 # Aha Vehicle Care — Scooter Sprint Mini Game
 
-This repository contains a Next.js 15 + React 19 app with a lightweight HTML5 Canvas racing mini-game accessible at `/racing`.
+A lightweight Next.js 15 + React 19 web app featuring an HTML5 Canvas racing mini‑game at `/racing`. Designed mobile‑first, but fully playable on desktop.
 
-## Run locally
+![Main screen](./public/MainScreen.png)
 
-1. Install dependencies
+---
 
+## Quick start (run locally)
+
+Prerequisites:
+- Node.js 18.18+ or 20+ (recommended)
+- npm 10+
+
+1) Install dependencies
 ```bash
 npm install
 ```
 
-2. Start the dev server (Turbopack)
-
+2) Start the dev server (Turbopack)
 ```bash
 npm run dev
 ```
 
-3. Open the app
+3) Open the app
+- Home: http://localhost:3000/
+- Game: http://localhost:3000/racing
 
-Visit http://localhost:3000, then navigate to http://localhost:3000/racing to play the mini game.
+Optional: run on another port (e.g., 4000)
+```bash
+npm run dev -- -p 4000
+```
+
+No environment variables are required to run locally.
+
+---
+
+## Production build
+```bash
+# create an optimized build
+npm run build
+
+# start the production server
+npm start
+```
+Then open http://localhost:3000 (or your chosen port).
+
+---
+
+## Available scripts
+- `npm run dev` — start Next.js dev server with Turbopack
+- `npm run build` — production build (includes TypeScript checks)
+- `npm start` — start the production server
+- `npm run lint` — run ESLint
+
+---
 
 ## Game overview
-
 - Theme: Casual scooter race on a sunny city loop.
 - Rendering: HTML5 Canvas for gameplay with React UI overlay (HUD, minimap, buttons).
 - Input:
@@ -29,15 +63,17 @@ Visit http://localhost:3000, then navigate to http://localhost:3000/racing to pl
   - Desktop: A/D or Left/Right to steer; Space to Boost; P/Esc to pause.
 - Objective: Complete 3 laps and finish first.
 - Collectibles: Coins on the track add to your global coins.
-- Power-up: Short speed boost with cooldown and visual trail.
-- AI: Two opponents with lane-following, mild rubber-banding, and occasional boosts.
+- Power‑up: Short speed boost with cooldown and visual trail.
+- AI: Two opponents with lane‑following, mild rubber‑banding, and occasional boosts.
 
-## Controls (quick)
+### Controls (quick)
 - A/D or ←/→: steer
-- Space or Boost button: activate boost
+- Space or Boost button: boost
 - P or Esc: pause
 
-## Files of interest
+---
+
+## Key files
 - Route: `src/app/racing/page.tsx`
 - Canvas renderer: `src/components/game/GameCanvas.tsx`
 - HUD: `src/components/game/HUD.tsx`
@@ -48,11 +84,16 @@ Visit http://localhost:3000, then navigate to http://localhost:3000/racing to pl
 - World/track helpers: `src/game/core/world.ts`
 - Opponent AI: `src/game/core/ai.ts`
 
-## Assets
-- The game uses simple vector drawing on Canvas for scooters/track.
-- UI icons reference small PNGs under `public/` (e.g., `ic_aha_coin.png`). You can replace these with your own assets if desired.
+---
 
-## Notes
-- State is mobile-first and aims for smooth 60 FPS on mid devices.
-- Player coins are persisted in localStorage via the shared game store.
-- Basic console telemetry logs race finish events.
+## Troubleshooting
+- Port already in use: change port with `npm run dev -- -p 4000`.
+- Node version issues: ensure Node 18.18+ or 20+ (`node -v`).
+- Clean state: delete `.next/` if you run into stale build artifacts and restart the dev server.
+- Fresh install: remove `node_modules` and `package-lock.json`, then `npm install`.
+
+---
+
+## Assets
+- Simple vector drawing on Canvas for scooters/track.
+- UI icons and sample images live under `public/`. Replace with your own as needed.
