@@ -33,6 +33,11 @@ export default function Home() {
                 Start
               </CTAButton>
             </Link>
+            <Link href="/racing" className="w-full sm:w-auto min-w-44">
+              <CTAButton className="bg-sky-500 hover:bg-sky-600">
+                Play Mini Game
+              </CTAButton>
+            </Link>
             <Link href="/leaderboard" className="text-orange-600 hover:underline text-sm">View Leaderboard</Link>
           </div>
         </div>
