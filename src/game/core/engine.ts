@@ -1,6 +1,6 @@
 "use client";
 import { useEffect, useMemo, useRef, useState } from "react";
-import { createOvalTrack, sampleTrack, Track, wrap01, progressDelta } from "./world";
+import { createStraightTrack, sampleTrack, Track, wrap01, progressDelta } from "./world";
 import { Racer, createAIRacers, updateAI } from "./ai";
 
 export type Phase = "loading" | "countdown" | "racing" | "paused" | "finished";
@@ -41,6 +41,7 @@ export type GameAPI = {
   tryBoost: () => void;
   togglePause: () => void;
   restart: () => void;
+  toggleLane?: () => void; // mobile steer helper
   // for canvas
   getPointerHandler: () => {
     onDown: (x: number) => void;
@@ -56,7 +57,7 @@ export type GameHooks = {
 
 export function useGameCore(config: GameConfig, hooks: GameHooks) {
   const [state, setState] = useState<GameStateCore>(() => {
-    const track = createOvalTrack({ x: 0, y: 0 }, config.trackRadius, config.trackRadius * 0.65, config.roadWidth / 2);
+    const track = createStraightTrack({ x: 0, y: -200 }, { x: 0, y: 200 }, config.roadWidth / 2);
     const player: Player = { u: 0, lane: 0, speed: 0, boosting: 0, boostCooldown: 0, coins: 0, laps: 0, lastU: 0 };
     const ai = createAIRacers(config.ai.count);
     return { phase: "countdown", time: 0, countdown: 3, track, player, ai, totalLaps: config.lapsToWin };
@@ -88,6 +89,15 @@ export function useGameCore(config: GameConfig, hooks: GameHooks) {
       const ai = createAIRacers(config.ai.count);
       setState({ phase: "countdown", time: 0, countdown: 3, track, player, ai, totalLaps: config.lapsToWin });
     },
+    toggleLane: () => {
+      setState((s) => {
+        if (s.phase !== "racing" && s.phase !== "countdown") return s;
+        const p = { ...s.player };
+        const target = p.lane >= 0 ? -0.6 : 0.6;
+        p.lane = target;
+        return { ...s, player: p };
+      });
+    },
     getPointerHandler: () => {
       return {
         onDown: (x) => {
@@ -111,7 +121,7 @@ export function useGameCore(config: GameConfig, hooks: GameHooks) {
     let last = performance.now();
     const tick = () => {
       const now = performance.now();
-      const dt = Math.min(0.05, (now - last) / 1000); // clamp
+      const dt = Math.min(0.02, (now - last) / 1000); // reduced clamp for smoother animation
       last = now;
       setState((s) => step(s, dt, config, hooks, desiredTurnRef.current));
       rafRef.current = requestAnimationFrame(tick);
@@ -173,16 +183,18 @@ function step(prev: GameStateCore, dt: number, config: GameConfig, hooks: GameHo
   // advance player
   s.player.speed = maxSpeed;
   s.player.lastU = s.player.u;
-  s.player.u = wrap01(s.player.u + s.player.speed * dt);
+  s.player.u = s.player.u + s.player.speed * dt;
 
-  // lap detection
-  const crossedStart = s.player.lastU > 0.9 && s.player.u < 0.1;
-  if (crossedStart) {
+  // lap detection for straight track
+  if (s.player.u >= 1.0) {
     s.player.laps += 1;
+    s.player.u = 0; // reset to start
+    s.player.lastU = 0;
     if (s.player.laps >= s.totalLaps) {
       // compute placement relative to AI
-      const others = s.ai.map((a) => a.u);
-      const ahead = others.filter((u) => progressDelta(u, s.player.u) > 0).length;
+      const others = s.ai.map((a) => a.u + a.laps || 0);
+      const playerTotal = s.player.u + s.player.laps;
+      const ahead = others.filter((total) => total > playerTotal).length;
       const place = ahead + 1; // 1 is first
       s.phase = "finished";
       s.lastFinishPlace = place;

@@ -4,49 +4,55 @@ export type Coin = { u: number; lane: number; taken?: boolean };
 export type Obstacle = { u: number; lane: number; radius: number };
 
 export type Track = {
-  // Parametric oval track; u in [0,1)
-  radiusX: number;
-  radiusY: number;
-  center: Vector;
-  length: number; // approximate perimeter
+  // Straight track; u in [0,1) represents progress along straight road
+  trackLength: number; // length of straight track
   roadHalfWidth: number;
+  startPoint: Vector;
+  endPoint: Vector;
   coins: Coin[];
   obstacles: Obstacle[];
 };
 
-export function createOvalTrack(center: Vector, radiusX: number, radiusY: number, roadHalfWidth: number): Track {
-  // Ramanujan approximation for ellipse perimeter
-  const h = Math.pow(radiusX - radiusY, 2) / Math.pow(radiusX + radiusY, 2);
-  const length = Math.PI * (radiusX + radiusY) * (1 + (3 * h) / (10 + Math.sqrt(4 - 3 * h)));
+export function createStraightTrack(startPoint: Vector, endPoint: Vector, roadHalfWidth: number): Track {
+  const trackLength = Math.sqrt(
+    Math.pow(endPoint.x - startPoint.x, 2) + Math.pow(endPoint.y - startPoint.y, 2)
+  );
 
-  // scatter coins and a few obstacles along the loop on lanes -1,0,1
+  // scatter coins and a few obstacles along the straight track on lanes -1,0,1
   const coins: Coin[] = [];
   const obstacles: Obstacle[] = [];
-  for (let i = 0; i < 45; i++) {
-    coins.push({ u: (i / 45 + Math.random() * 0.01) % 1, lane: [-0.6, 0, 0.6][i % 3] });
+  for (let i = 0; i < 30; i++) {
+    coins.push({ u: (i / 30 + Math.random() * 0.02), lane: [-0.6, 0, 0.6][i % 3] });
   }
-  for (let i = 0; i < 6; i++) {
-    obstacles.push({ u: (i / 6 + 0.08) % 1, lane: i % 2 === 0 ? -0.4 : 0.4, radius: 10 });
+  for (let i = 0; i < 4; i++) {
+    obstacles.push({ u: (i / 4 + 0.1), lane: i % 2 === 0 ? -0.4 : 0.4, radius: 10 });
   }
 
-  return { radiusX, radiusY, center, length, roadHalfWidth, coins, obstacles };
-}
-
-export function uToTheta(u: number) {
-  return u * Math.PI * 2;
+  return { trackLength, roadHalfWidth, startPoint, endPoint, coins, obstacles };
 }
 
 export function sampleTrack(track: Track, u: number, lateral: number): Vector {
-  // lateral in [-1,1] scaled by roadHalfWidth
-  const th = uToTheta(u);
-  const nx = Math.cos(th);
-  const ny = Math.sin(th);
-  const px = track.center.x + track.radiusX * nx;
-  const py = track.center.y + track.radiusY * ny;
-  // outward normal for ellipse is not unit circle's normal; approximate using angle normal
-  const tx = -ny;
-  const ty = nx;
-  return { x: px + tx * lateral * track.roadHalfWidth, y: py + ty * lateral * track.roadHalfWidth };
+  // u in [0,1] represents progress along straight track
+  // lateral in [-1,1] scaled by roadHalfWidth represents side-to-side position
+  const clampedU = Math.max(0, Math.min(1, u));
+  
+  // Linear interpolation along the track
+  const px = track.startPoint.x + (track.endPoint.x - track.startPoint.x) * clampedU;
+  const py = track.startPoint.y + (track.endPoint.y - track.startPoint.y) * clampedU;
+  
+  // Calculate perpendicular direction for lateral offset
+  const dx = track.endPoint.x - track.startPoint.x;
+  const dy = track.endPoint.y - track.startPoint.y;
+  const length = Math.sqrt(dx * dx + dy * dy);
+  
+  // Normalized perpendicular vector (90 degrees rotated)
+  const perpX = -dy / length;
+  const perpY = dx / length;
+  
+  return {
+    x: px + perpX * lateral * track.roadHalfWidth,
+    y: py + perpY * lateral * track.roadHalfWidth
+  };
 }
 
 export function wrap01(u: number) {
@@ -55,9 +61,6 @@ export function wrap01(u: number) {
 }
 
 export function progressDelta(a: number, b: number) {
-  // signed shortest difference b-a on circle [0,1)
-  let d = wrap01(b) - wrap01(a);
-  if (d > 0.5) d -= 1;
-  if (d < -0.5) d += 1;
-  return d;
+  // signed difference b-a on straight track [0,1]
+  return b - a;
 }

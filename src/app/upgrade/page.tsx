@@ -8,11 +8,20 @@ export default function UpgradePage() {
   const { vehicle } = useGameState();
   const upgrades = vehicle.upgrades || {};
 
+  // All available upgrades to match shop consistency
   const items: { key: keyof typeof upgrades; label: string; icon: string }[] = [
     { key: "shinyWheels", label: "Shiny Wheels", icon: "🛞" },
     { key: "performance", label: "Performance Kit", icon: "⚙️" },
     { key: "deluxeSponge", label: "Deluxe Sponge", icon: "🧽" },
     { key: "customPaint", label: "Custom Paint", icon: "🎨" },
+    { key: "turboBoost", label: "Turbo Boost", icon: "🚀" },
+    { key: "neonLights", label: "Neon Lights", icon: "💡" },
+    { key: "horn", label: "Funny Horn", icon: "📯" },
+    { key: "gps", label: "GPS Tracker", icon: "📡" },
+    { key: "music", label: "Music Player", icon: "🎵" },
+    { key: "seatCover", label: "Seat Cover", icon: "🪑" },
+    { key: "helmet", label: "Safety Helmet", icon: "🪖" },
+    { key: "deliveryBox", label: "Delivery Box", icon: "📦" },
   ];
 
   return (
