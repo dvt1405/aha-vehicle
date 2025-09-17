@@ -19,6 +19,14 @@ export interface Upgrades {
   performance?: boolean;
   deluxeSponge?: boolean;
   customPaint?: boolean;
+  turboBoost?: boolean;
+  gps?: boolean;
+  helmet?: boolean;
+  seatCover?: boolean;
+  neonLights?: boolean;
+  horn?: boolean;
+  music?: boolean;
+  deliveryBox?: boolean;
 }
 
 export interface Vehicle {

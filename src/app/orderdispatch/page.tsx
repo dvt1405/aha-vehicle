@@ -211,7 +211,7 @@ export default function OrderDispatchSimulator() {
   const [msg, setMsg] = useState<string | null>(null);
   const [quizOpen, setQuizOpen] = useState(false);
   const [quizStop, setQuizStop] = useState<Stop | null>(null);
-  const animRef = useRef<number>();
+  const animRef = useRef<number | undefined>(undefined);
 
   // Animation loop
   useEffect(() => {
@@ -221,6 +221,7 @@ export default function OrderDispatchSimulator() {
       const dt = Math.min((now - last) / 1000, 0.1);
       last = now;
       setDriver((pos) => {
+        if (!currentOrder) return pos;
         const stop = currentOrder.stops[currentStopIdx];
         if (!stop) return pos;
         const next = moveToward(pos, stop.location, 180 * dt);
@@ -233,7 +234,11 @@ export default function OrderDispatchSimulator() {
       animRef.current = requestAnimationFrame(frame);
     }
     animRef.current = requestAnimationFrame(frame);
-    return () => animRef.current && cancelAnimationFrame(animRef.current);
+    return () => {
+      if (animRef.current) {
+        cancelAnimationFrame(animRef.current);
+      }
+    };
     // eslint-disable-next-line
   }, [currentOrder, status, currentStopIdx, quizOpen]);
 

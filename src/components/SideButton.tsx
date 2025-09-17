@@ -14,7 +14,7 @@ export type SideButtonProps = (
 };
 
 function isLinkProps(p: SideButtonProps): p is Extract<SideButtonProps, { as: "link"; href: string; onClick?: never }> {
-  return p.as === "link" && typeof (p as any).href === "string";
+  return p.as === "link" && "href" in p && typeof p.href === "string";
 }
 
 export default function SideButton(props: SideButtonProps) {

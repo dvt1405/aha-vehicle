@@ -1,8 +1,7 @@
 "use client";
 import React, { useEffect, useRef } from "react";
 import { PublicState } from "@/game/core/engine";
-import { sampleTrack } from "@/game/core/world";
-import type { Track } from "@/game/core/world";
+import { sampleTrack, Track } from "@/game/core/world";
 import { drawMotorbike } from "@/utils/drawMotorbike";
 
 export default function GameCanvas({ api, state, playerImageSrc }: { api: { setTurn: (d:number)=>void; getPointerHandler:()=>{onDown:(x:number)=>void;onMove:(x:number)=>void;onUp:()=>void}; tryBoost: ()=>void }; state: PublicState; playerImageSrc?: string }) {
@@ -260,7 +259,7 @@ function pathEllipse(ctx: CanvasRenderingContext2D, cx:number, cy:number, rx:num
   ctx.ellipse(cx, cy, rx, ry, 0, 0, Math.PI*2);
 }
 
-function drawScooter(ctx: CanvasRenderingContext2D, t:any, u:number, lane:number, color:string, hasRider:boolean=false){
+function drawScooter(ctx: CanvasRenderingContext2D, t:Track, u:number, lane:number, color:string, hasRider:boolean=false){
   const p = sampleTrack(t, u, lane);
   // For straight track, all vehicles point straight up (0 degrees)
   const th = 0;
